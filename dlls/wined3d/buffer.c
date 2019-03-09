@@ -1524,7 +1524,6 @@ static const struct wined3d_resource_ops buffer_resource_ops =
     buffer_resource_preload,
     buffer_unload,
     buffer_resource_sub_resource_map,
-    buffer_resource_sub_resource_map_info,
     buffer_resource_sub_resource_unmap,
     buffer_resource_sub_resource_map_cs,
     buffer_resource_sub_resource_unmap_cs,

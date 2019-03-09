@@ -389,8 +389,6 @@ HRESULT CDECL wined3d_resource_map(struct wined3d_resource *resource, unsigned i
     return hr;
 }
 
-HRESULT CDECL wined3d_resource_map_info(struct wined3d_resource *resource, unsigned int sub_resource_idx,
-
 HRESULT CDECL wined3d_resource_unmap(struct wined3d_resource *resource, unsigned int sub_resource_idx)
 {
     HRESULT hr;
@@ -403,8 +401,6 @@ HRESULT CDECL wined3d_resource_unmap(struct wined3d_resource *resource, unsigned
     }
     return hr;
 }
-
-UINT CDECL wined3d_resource_update_info(struct wined3d_resource *resource, unsigned int sub_resource_idx,
 
 void CDECL wined3d_resource_preload(struct wined3d_resource *resource)
 {
