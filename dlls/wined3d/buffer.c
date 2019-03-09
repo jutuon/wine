@@ -277,7 +277,6 @@ fail:
 /* Context activation is done by the caller. */
 static BOOL buffer_alloc_persistent_map(struct wined3d_buffer *buffer, struct wined3d_context *context)
 {
-    struct wined3d_buffer_gl *buffer_gl = wined3d_buffer_gl(buffer);
     struct wined3d_device *device = buffer_gl->b.resource.device;
     struct wined3d_buffer_heap *heap;
     struct wined3d_map_range map_range;
@@ -1427,7 +1426,7 @@ static HRESULT buffer_resource_sub_resource_map(struct wined3d_resource *resourc
     // which require no GL calls to interface with.
     if (buffer->locations & WINED3D_LOCATION_PERSISTENT_MAP)
     {
-        map_desc->row_pitch = map_desc->slice_pitch = buffer->resource.size;
+        map_desc->row_pitch = map_desc->slice_pitch = buffer->desc.byte_width;
         if (buffer_gl->b.flags & WINED3D_MAP_DISCARD)
         {
             HRESULT hr;
