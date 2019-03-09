@@ -277,6 +277,7 @@ fail:
 /* Context activation is done by the caller. */
 static BOOL buffer_alloc_persistent_map(struct wined3d_buffer *buffer, struct wined3d_context *context)
 {
+    struct wined3d_buffer_gl *buffer_gl = wined3d_buffer_gl(buffer);
     struct wined3d_device *device = buffer_gl->b.resource.device;
     struct wined3d_buffer_heap *heap;
     struct wined3d_map_range map_range;
@@ -289,7 +290,7 @@ static BOOL buffer_alloc_persistent_map(struct wined3d_buffer *buffer, struct wi
     }
     else
     {
-        if (!(buffer_gl->b.resource.usage & WINED3DUSAGE_WRITEONLY))
+        if (!(!(buffer_gl->b.resource.access & WINED3D_RESOURCE_ACCESS_MAP_R) && buffer_gl->b.resource.access & WINED3D_RESOURCE_ACCESS_MAP_W))
             FIXME("Using a write-only persistent buffer for %p without WINED3DUSAGE_WRITEONLY.\n", buffer_gl);
         heap = device->wo_buffer_heap;
     }
@@ -1412,7 +1413,8 @@ static void buffer_resource_preload(struct wined3d_resource *resource)
 static HRESULT buffer_resource_sub_resource_map(struct wined3d_resource *resource, unsigned int sub_resource_idx,
         struct wined3d_map_desc *map_desc, const struct wined3d_box *box, DWORD flags)
 {
-    struct wined3d_buffer_gl *buffer_gl = wined3d_buffer_gl(buffer_from_resource(resource));
+    struct wined3d_buffer *buffer = buffer_from_resource(resource);
+    struct wined3d_buffer_gl *buffer_gl = wined3d_buffer_gl(buffer);
     UINT offset = box ? box->left : 0;
 
     if (sub_resource_idx)
@@ -1425,7 +1427,7 @@ static HRESULT buffer_resource_sub_resource_map(struct wined3d_resource *resourc
     // which require no GL calls to interface with.
     if (buffer->locations & WINED3D_LOCATION_PERSISTENT_MAP)
     {
-        map_desc->row_pitch = map_desc->slice_pitch = buffer->desc.byte_width;
+        map_desc->row_pitch = map_desc->slice_pitch = buffer->resource.size;
         if (buffer_gl->b.flags & WINED3D_MAP_DISCARD)
         {
             HRESULT hr;
