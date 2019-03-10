@@ -860,7 +860,7 @@ static void create_buffer_heap(struct wined3d_device *device, struct wined3d_con
     else
     {
         //(Firerat) is it worth initialising an int for vram?
-        unsigned int vram_mb = device->adapter->vram_bytes / 1048576;
+        unsigned int vram_mb = device->adapter->driver_info.vram_bytes / 1048576;
         const char *env_pba_geo_heap = getenv("__PBA_GEO_HEAP");
         // TODO(acomminos): kill this magic number. perhaps base on vram.
         unsigned int geo_heap = ( env_pba_geo_heap ? atoi(env_pba_geo_heap) : 512 );
