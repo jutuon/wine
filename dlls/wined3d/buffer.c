@@ -1439,7 +1439,7 @@ static HRESULT buffer_resource_sub_resource_map(struct wined3d_resource *resourc
         }
 
         map_desc->row_pitch = map_desc->slice_pitch = resource->size;
-        if (buffer_gl->b.flags & WINED3D_MAP_DISCARD)
+        if (flags & WINED3D_MAP_DISCARD)
         {
             HRESULT hr;
             struct wined3d_buffer_heap_element *mt_elem;
@@ -1459,7 +1459,7 @@ static HRESULT buffer_resource_sub_resource_map(struct wined3d_resource *resourc
             wined3d_cs_emit_discard_buffer(resource->device->cs, buffer_gl, mt_elem);
             return WINED3D_OK;
         }
-        else if (buffer_gl->b.flags & WINED3D_MAP_NOOVERWRITE)
+        else if (flags & WINED3D_MAP_NOOVERWRITE)
         {
             // Allow immediate access for persistent buffers without a fence.
             // Always use the latest buffer in this case in case the latest
