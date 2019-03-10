@@ -863,11 +863,11 @@ static void create_buffer_heap(struct wined3d_device *device, struct wined3d_con
         unsigned int vram_mb = device->adapter->driver_info.vram_bytes / 1048576;
         const char *env_pba_geo_heap = getenv("__PBA_GEO_HEAP");
         // TODO(acomminos): kill this magic number. perhaps base on vram.
-        unsigned int geo_heap = ( env_pba_geo_heap ? atoi(env_pba_geo_heap) : 512 );
+        unsigned int geo_heap = ( env_pba_geo_heap ? (unsigned int) strtol(env_pba_geo_heap, NULL, 10) : 512 );
         const char *env_pba_cb_heap = getenv("__PBA_CB_HEAP");
         // We choose a constant buffer size of 128MB, the same as NVIDIA claims to
         // use in their Direct3D driver for discarded constant buffers.
-        unsigned int cb_heap = ( env_pba_cb_heap ? atoi(env_pba_cb_heap) : 128 );
+        unsigned int cb_heap = ( env_pba_cb_heap ? (unsigned int) strtol(env_pba_cb_heap, NULL, 10) : 128 );
 
         if (env_pba_geo_heap)
         {
@@ -878,6 +878,7 @@ static void create_buffer_heap(struct wined3d_device *device, struct wined3d_con
             FIXME_(d3d_perf)("cb_heap_size set by envvar __PBA_CB_HEAP=%s\n",env_pba_cb_heap);
         }
 
+        // TODO: Fix possible overflow.
         if ( geo_heap + cb_heap > vram_mb )
         {
             FIXME_(d3d_perf)("geo_heap + cb_heap ( %dmb + %dmb ) exceeds vram of %dmb. Dropping back to PBA defaults\n", geo_heap, cb_heap, vram_mb);
@@ -886,8 +887,8 @@ static void create_buffer_heap(struct wined3d_device *device, struct wined3d_con
                 //TODO (Firerat) I should probably figure out if using dx10+ ( possible? ), could skip cb_heap if not
                 FIXME_(d3d_perf)("You have low vram(%dmb), making crude guess at reasonable heap sizes for PBA\n", vram_mb);
                 // very crude, using 87.5% of vram
-                geo_heap = vram_mb * 0.75; // 3 quarters of vram
-                cb_heap = vram_mb * 0.125; // 8th of vram, probably too low
+                geo_heap = (unsigned int) (((double) vram_mb) * 0.75); // 3 quarters of vram
+                cb_heap = (unsigned int) (((double) vram_mb) * 0.125); // 8th of vram, probably too low
                 FIXME_(d3d_perf)("guess expressed as envvars: __PBA_GEO_HEAP=%d __PBA_CB_HEAP=%d\n", geo_heap, cb_heap);
                 //TODO (Firerat) might not be worth messing about here, just fail with note about envvars
             }
@@ -898,8 +899,10 @@ static void create_buffer_heap(struct wined3d_device *device, struct wined3d_con
                 cb_heap = 128;
             }
         }
-        GLsizeiptr geo_heap_size = geo_heap * 1024 * 1024;
-        GLsizeiptr cb_heap_size = cb_heap * 1024 * 1024;
+
+        // TODO: Fix possible overflow.
+        GLsizeiptr geo_heap_size = ((GLsizeiptr) geo_heap) * 1024 * 1024;
+        GLsizeiptr cb_heap_size = ((GLsizeiptr) cb_heap) * 1024 * 1024;
         GLint ub_alignment;
         HRESULT hr;
 
